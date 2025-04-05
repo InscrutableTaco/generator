@@ -1,1 +1,1 @@
-# static_site_generator
+# generator
