@@ -2,6 +2,7 @@ import unittest
 
 from htmlnode import *
 from textnode import *
+from transforms import *
 
 '''
 The HTMLNode class should have 4 data members set in the constructor:
