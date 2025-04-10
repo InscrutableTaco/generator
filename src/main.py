@@ -1,9 +1,9 @@
-from textnode import *
+from textnode import TextNode, TextType
 
-print("Hello losers!\n")
 
 def main():
-    my_node = TextNode("Here's some link text",TextType.LINK,"www.stupid.whatever")
-    print(my_node)
+    node = TextNode("This is a text node", TextType.BOLD, "https://www.boot.dev")
+    print(node)
+
 
 main()
