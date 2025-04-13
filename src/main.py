@@ -1,6 +1,13 @@
 import shutil
 import os
 from markdown_blocks import *
+import sys
+
+# Get basepath from command line or use default
+if len(sys.argv) > 1:
+    basepath = sys.argv[1]
+else:
+    basepath = "/"
 
 def copy_dir2dir(source, destination):
     #raise exception if source doesn't exist. delete destination if it exists
@@ -44,7 +51,7 @@ def extract_title(markdown):
     else:
         return titles[0].strip("#").strip()
     
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     with open(from_path, "r") as from_file, \
         open(template_path, "r") as template_file, \
@@ -61,10 +68,13 @@ def generate_page(from_path, template_path, dest_path):
         # Replace placeholders
         final_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html)
 
+        final_html = final_html.replace('href="/', f'href="{basepath}')
+        final_html = final_html.replace('src="/', f'src="{basepath}')
+
         # Write to the destination file
         dest_file.write(final_html)
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     for item in os.listdir(dir_path_content):
         full_path = os.path.join(dir_path_content, item)
         
@@ -74,15 +84,15 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
                 relative_path = os.path.relpath(full_path, dir_path_content)
                 destination_path = os.path.join(dest_dir_path, os.path.splitext(relative_path)[0] + ".html")
                 os.makedirs(os.path.dirname(destination_path), exist_ok=True)
-                generate_page(full_path, template_path, destination_path)
+                generate_page(full_path, template_path, destination_path, basepath)
         elif os.path.isdir(full_path):
             # Adjust dest_dir_path for subdirectory
             new_dest_dir_path = os.path.join(dest_dir_path, os.path.relpath(full_path, dir_path_content))
-            generate_pages_recursive(full_path, template_path, new_dest_dir_path)
+            generate_pages_recursive(full_path, template_path, new_dest_dir_path, basepath)
 
             
 
 def main():
-    copy_dir2dir("static", "public")
-    generate_pages_recursive("content", "template.html", "public")
+    copy_dir2dir("static", "docs")
+    generate_pages_recursive("content", "template.html", "docs", basepath)
 main()
